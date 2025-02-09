@@ -51,3 +51,20 @@ func (c *Context) SendMessage(
 
 	return res, nil
 }
+
+// EditMessageText https://core.telegram.org/bots/api#editmessagetext
+func (c *Context) EditMessageText(
+	params *bot.EditMessageTextParams,
+) (*models.Message, error) {
+	client, err := c.getClient()
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := client.EditMessageText(c.ctx, params)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return res, nil
+}

@@ -51,7 +51,8 @@ func (c *Context) Pattern() string {
 // It executes the pending handlers in the chain inside the calling handler.
 func (c *Context) Next() {
 	c.index++
-	if c.index < len(c.handlers) {
+
+	for c.index < len(c.handlers) {
 		h := c.handlers[c.index]
 		if h != nil {
 			h(c)
