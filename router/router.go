@@ -26,11 +26,13 @@ type Router struct {
 	describer   *texts.CommandDescriber
 	ctxPool     sync.Pool
 	bufferPool  sync.Pool
+	notFound    Handler
 }
 
 func New(opts ...Option) *Router {
 	res := &Router{
 		describer: texts.NewCommandDescriber(),
+		notFound:  AutoAccept(),
 	}
 	res.ctxPool.New = res.newContext
 	res.bufferPool.New = func() any {
@@ -113,6 +115,14 @@ func (r *Router) Custom(
 	r.custom.AddHandler(matcher, handler...)
 }
 
+func (r *Router) NotFound(handler Handler) {
+	if handler == nil {
+		handler = AutoAccept()
+	}
+
+	r.notFound = handler
+}
+
 func (r *Router) ListCommandsParams() []*apimodels.SetMyCommandsParams {
 	return r.describer.ListCommandsParams()
 }
@@ -175,7 +185,7 @@ func (r *Router) Handle(
 	}
 
 	if !ok {
-		return false, nil
+		handlers = []Handler{r.notFound}
 	}
 
 	rCtx := r.getContext()

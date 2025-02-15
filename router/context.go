@@ -33,7 +33,9 @@ type CtxTemp struct {
 }
 
 func (c *Context) reset() {
-	c.CtxTemp = CtxTemp{}
+	c.CtxTemp = CtxTemp{
+		index: -1,
+	}
 }
 
 func (c *Context) Context() context.Context {
