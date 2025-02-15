@@ -23,6 +23,7 @@ type Context struct {
 type CtxTemp struct {
 	ctx      context.Context //nolint:containedctx
 	update   *models.Update
+	text     *string
 	pattern  string
 	raw      *bytes.Buffer
 	handlers []Handler

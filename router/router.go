@@ -21,6 +21,7 @@ type Router struct {
 	middlewares []Handler
 	texts       commandList
 	callbacks   commandList
+	inlines     commandList
 	custom      customCommandList
 	describer   *texts.CommandDescriber
 	ctxPool     sync.Pool
@@ -50,6 +51,11 @@ func (r *Router) Use(handler ...Handler) {
 	r.middlewares = append(r.middlewares, handler...)
 }
 
+// Text registers a new text command.
+// The command is a simple pattern that can contain only text.
+//
+// WARNING: this method must be called in the initialization phase.
+// It panics if an error occurs.
 func (r *Router) Text(
 	command texts.SimplePattern,
 	handler ...Handler,
@@ -65,6 +71,11 @@ func (r *Router) Text(
 	}
 }
 
+// Callback registers a new callback command.
+// The command is a simple pattern that can contain only text.
+//
+// WARNING: this method must be called in the initialization phase.
+// It panics if an error occurs.
 func (r *Router) Callback(
 	command texts.SimplePattern,
 	handler ...Handler,
@@ -75,6 +86,26 @@ func (r *Router) Callback(
 	}
 }
 
+// Inline registers a new inline command.
+// The command is a simple pattern that can contain only text.
+//
+// WARNING: this method must be called in the initialization phase.
+// It panics if an error occurs.
+func (r *Router) Inline(
+	command texts.SimplePattern,
+	handler ...Handler,
+) {
+	err := r.inlines.AddHandler(command, handler...)
+	if err != nil {
+		panic(err)
+	}
+}
+
+// Custom registers a new custom command.
+// The command is a custom pattern that can contain any data.
+//
+// WARNING: this method must be called in the initialization phase.
+// It panics if an error occurs.
 func (r *Router) Custom(
 	matcher UpdateMatcher,
 	handler ...Handler,
@@ -123,13 +154,19 @@ func (r *Router) Handle(
 		ok       bool
 		pattern  string
 		handlers []Handler
+		text     *string
 	)
 
 	switch {
 	case update.Message != nil:
 		handlers, pattern, ok = r.texts.FindHandler(update.Message.Text)
+		text = &update.Message.Text
 	case update.CallbackQuery != nil:
 		handlers, pattern, ok = r.callbacks.FindHandler(update.CallbackQuery.Data)
+		text = &update.CallbackQuery.Data
+	case update.InlineQuery != nil:
+		handlers, pattern, ok = r.inlines.FindHandler(update.InlineQuery.Query)
+		text = &update.InlineQuery.Query
 	}
 
 	if !ok {
@@ -146,6 +183,7 @@ func (r *Router) Handle(
 
 	rCtx.ctx = ctx
 	rCtx.update = update
+	rCtx.text = text
 	rCtx.pattern = pattern
 	rCtx.handlers = slices.Concat(r.middlewares, handlers)
 
