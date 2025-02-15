@@ -12,6 +12,7 @@ import (
 	"github.com/go-telegram/bot"
 	"github.com/opoccomaxao/tg-instrumentation/apimodels"
 	"github.com/opoccomaxao/tg-instrumentation/texts"
+	"github.com/pkg/errors"
 )
 
 type Router struct {
@@ -201,4 +202,18 @@ func (r *Router) HandlerFunc(
 	} else {
 		writer.WriteHeader(http.StatusNotFound)
 	}
+}
+
+// UpdateCommandsDescription sends all registered commands to Telegram API.
+func (r *Router) UpdateCommandsDescription(
+	ctx context.Context,
+) error {
+	for _, params := range r.ListCommandsParams() {
+		_, err := r.client.SetMyCommands(ctx, params)
+		if err != nil {
+			return errors.WithStack(err)
+		}
+	}
+
+	return nil
 }
