@@ -26,3 +26,18 @@ func (c *Context) RespondReactionEmoji(
 		},
 	})
 }
+
+// RespondCallbackText sends a text response to the callback query from the context.
+func (c *Context) RespondCallbackText(
+	text string,
+) (bool, error) {
+	update := c.Update()
+	if update.CallbackQuery == nil {
+		return false, errors.Wrap(ErrFailed, "supported only callback queries")
+	}
+
+	return c.AnswerCallbackQuery(&bot.AnswerCallbackQueryParams{
+		CallbackQueryID: update.CallbackQuery.ID,
+		Text:            text,
+	})
+}

@@ -52,6 +52,25 @@ func (c *Context) SendMessage(
 	return res, nil
 }
 
+// SendPhoto https://core.telegram.org/bots/api#sendphoto
+func (c *Context) SendPhoto(
+	params *bot.SendPhotoParams,
+) (*models.Message, error) {
+	client, err := c.getClient()
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := client.SendPhoto(c.ctx, params)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	c.Accept()
+
+	return res, nil
+}
+
 // EditMessageText https://core.telegram.org/bots/api#editmessagetext
 func (c *Context) EditMessageText(
 	params *bot.EditMessageTextParams,
@@ -62,6 +81,23 @@ func (c *Context) EditMessageText(
 	}
 
 	res, err := client.EditMessageText(c.ctx, params)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return res, nil
+}
+
+// EditMessageMedia https://core.telegram.org/bots/api#editmessagemedia
+func (c *Context) EditMessageMedia(
+	params *bot.EditMessageMediaParams,
+) (*models.Message, error) {
+	client, err := c.getClient()
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := client.EditMessageMedia(c.ctx, params)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

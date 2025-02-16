@@ -57,8 +57,20 @@ func (q *Query) WithParam(key string, value string) *Query {
 	return q
 }
 
+func (q *Query) WithParamEmpty(key string) *Query {
+	q.Params[key] = q.Params[key] //nolint:staticcheck // add key to the map.
+
+	return q
+}
+
 func (q *Query) WithParamInt64(key string, value int64) *Query {
 	return q.WithParam(key, strconv.FormatInt(value, 10))
+}
+
+func (q *Query) Has(key string) bool {
+	_, ok := q.Params[key]
+
+	return ok
 }
 
 func (q *Query) Get(key string) (string, bool) {
