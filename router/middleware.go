@@ -31,13 +31,18 @@ func AutoAccept() Handler {
 
 func AutoAnswerCallbackQuery() Handler {
 	return func(ctx *Context) {
+		update := ctx.Update()
+		if update.CallbackQuery == nil {
+			return
+		}
+
 		defer func() {
 			if ctx.IsAccepted() {
 				return
 			}
 
 			_, err := ctx.AnswerCallbackQuery(&bot.AnswerCallbackQueryParams{
-				CallbackQueryID: ctx.Update().CallbackQuery.ID,
+				CallbackQueryID: update.CallbackQuery.ID,
 			})
 			if err != nil {
 				ctx.Error(errors.WithStack(err))

@@ -103,3 +103,48 @@ func (c *Context) RawDebug() []byte {
 
 	return c.raw.Bytes()
 }
+
+// LogError1 checks and logs an error.
+//
+// Use it if you don't care about the error, but want to log it.
+//
+// Example:
+//
+//	func doSomething() error {...}
+//
+//	ctx.LogError1(doSomething())
+func (c *Context) LogError1(err error) {
+	if err != nil {
+		c.Error(err)
+	}
+}
+
+// LogError2 checks and logs an error.
+//
+// Use it if you don't care about the error, but want to log it.
+//
+// Example:
+//
+//	func doSomething2() (sometype, error) {...}
+//
+//	ctx.LogError2(doSomething2())
+func (c *Context) LogError2(_ any, err error) {
+	if err != nil {
+		c.Error(err)
+	}
+}
+
+// LogError3 checks and logs an error.
+//
+// Use it if you don't care about the error, but want to log it.
+//
+// Example:
+//
+//	func doSomething3() (sometype, sometype2, error) {...}
+//
+//	ctx.LogError3(doSomething3())
+func (c *Context) LogError3(_ any, _ any, err error) {
+	if err != nil {
+		c.Error(err)
+	}
+}

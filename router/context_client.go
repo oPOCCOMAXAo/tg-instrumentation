@@ -68,3 +68,22 @@ func (c *Context) EditMessageText(
 
 	return res, nil
 }
+
+// SetMessageReaction https://core.telegram.org/bots/api#setmessagereaction
+func (c *Context) SetMessageReaction(
+	params *bot.SetMessageReactionParams,
+) (bool, error) {
+	client, err := c.getClient()
+	if err != nil {
+		return false, err
+	}
+
+	res, err := client.SetMessageReaction(c.ctx, params)
+	if err != nil {
+		return false, errors.WithStack(err)
+	}
+
+	c.Accept()
+
+	return res, nil
+}
