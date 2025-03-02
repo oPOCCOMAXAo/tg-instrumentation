@@ -123,3 +123,22 @@ func (c *Context) SetMessageReaction(
 
 	return res, nil
 }
+
+// DeleteMessage https://core.telegram.org/bots/api#deletemessage
+func (c *Context) DeleteMessage(
+	params *bot.DeleteMessageParams,
+) (bool, error) {
+	client, err := c.getClient()
+	if err != nil {
+		return false, err
+	}
+
+	res, err := client.DeleteMessage(c.ctx, params)
+	if err != nil {
+		return false, errors.WithStack(err)
+	}
+
+	c.Accept()
+
+	return res, nil
+}
