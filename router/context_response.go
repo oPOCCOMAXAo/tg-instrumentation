@@ -6,6 +6,26 @@ import (
 	"github.com/pkg/errors"
 )
 
+// RespondPrivateMessage sends a message to the user from the context.
+func (c *Context) RespondPrivateMessage(
+	params *bot.SendMessageParams,
+) (*models.Message, error) {
+	update := c.Update()
+
+	switch {
+	case update.Message != nil:
+		params.ChatID = update.Message.From.ID
+	case update.CallbackQuery != nil:
+		params.ChatID = update.CallbackQuery.From.ID
+	case update.InlineQuery != nil:
+		params.ChatID = update.InlineQuery.From.ID
+	default:
+		return nil, errors.Wrap(ErrFailed, "unsupported update type")
+	}
+
+	return c.SendMessage(params)
+}
+
 // RespondReactionEmoji sends a reaction to the message from the context.
 func (c *Context) RespondReactionEmoji(
 	emoji string,
@@ -24,6 +44,15 @@ func (c *Context) RespondReactionEmoji(
 				ReactionTypeEmoji: &models.ReactionTypeEmoji{Emoji: emoji},
 			},
 		},
+	})
+}
+
+// RespondPrivateMessageText sends a text message to the user from the context.
+func (c *Context) RespondPrivateMessageText(
+	text string,
+) (*models.Message, error) {
+	return c.RespondPrivateMessage(&bot.SendMessageParams{
+		Text: text,
 	})
 }
 
